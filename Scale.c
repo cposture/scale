@@ -15,7 +15,7 @@
  *	No	version		Data		Revised By			Item			Description
  *	1	v1.0		8/17		Ray	
  *	2	v1.1		12/26		Ray									将电子秤功能封装成一个模块，并优化显示
- *
+ *	3	v1.2		12/26		陈家启							增加作弊模式
  ***************************************************************************************/
 
 
@@ -50,6 +50,7 @@
 static uchar ENTER = 0,len = 0 ;
 static uchar s[20];
 static float idata weight,z_weight = 77.58;
+static uchar cheat = 0;
 
 /**************************************************************
 *	File Static Variable Define Section
@@ -90,6 +91,9 @@ void Scale()
 	if( keyScan_one_KEY(&tmp) )
 		Key_process(&z_weight,dig,tmp);
 	weight = Caculate_weight(dig)-z_weight;
+	
+	if( cheat )
+		weight *= 1.1;
 	Display_LCD(weight);
 	
 	return;	
@@ -189,6 +193,10 @@ void Key_process(float *pzero,ulong dig,uchar key)
 			s[len++] = '9';
 			break;
 		case 0x03:				//清除所有价格输入
+			if( s[0] == '1' && s[1] == '2' && s[2] == '3' && s[3] == '4' )// 进入作弊模式
+				cheat = 1;
+			else if( s[0] == '5' && s[1] == '6' && s[2] == '7' && s[3] == '8' )//恢复正常模式
+				cheat = 0;
 			len = 0;
 			write_cmd(0x01);
 			ENTER = 0;
